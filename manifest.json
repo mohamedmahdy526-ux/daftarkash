@@ -1,0 +1,22 @@
+{
+  "name": "دفتر كاش | إدارة الديون والحسابات",
+  "short_name": "دفتر كاش",
+  "description": "تطبيق إدارة حسابات وديون البقالة والمحلات سريع ويعمل بدون إنترنت",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0B0F19",
+  "theme_color": "#0F172A",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2830/2830284.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2830/2830284.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

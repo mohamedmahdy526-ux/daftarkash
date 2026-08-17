@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>دفتر كاش | إدارة الديون وحسابات المحلات</title>
+  
+  <!-- PWA Settings -->
+  <meta name="theme-color" content="#0F172A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Google Fonts: Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- CDN Libraries: Dexie, SheetJS, Lucide, html5-qrcode, canvas-confetti -->
+  <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-dark">
+
+  <!-- Main Mobile App Top Bar -->
+  <header class="app-header" id="appHeader">
+    <div class="header-content">
+      
+      <!-- Root Brand Header Section -->
+      <div class="brand-section" id="headerBrandSection">
+        <div class="brand-icon">
+          <i data-lucide="wallet-cards"></i>
+        </div>
+        <div>
+          <h1 class="store-title" id="displayStoreName">بقالة البركة</h1>
+          <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span class="status-text" id="offlineStatus">شغال بدون نت (محلي)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Screen Navigation Header (Back Button) -->
+      <div class="sub-header-section" id="headerSubSection" style="display: none;">
+        <button class="back-btn" id="headerBackBtn">
+          <i data-lucide="arrow-right"></i>
+          <span>رجوع</span>
+        </button>
+        <h2 class="sub-header-title" id="headerSubTitle">تفاصيل الحساب</h2>
+      </div>
+
+      <!-- Header actions -->
+      <div class="header-actions">
+        <div class="cloud-sync-pill" id="cloudSyncIndicator" title="حالة المزامنة السحابية مع Google Sheets">
+          <span class="sync-dot" id="syncStatusDot"></span>
+          <i data-lucide="cloud" id="cloudSyncIcon" style="width: 15px; height: 15px;"></i>
+          <span class="sync-label" id="cloudSyncText">متزامن ☁️</span>
+        </div>
+        <button class="icon-btn" id="toggleThemeBtn" title="تبديل الوضع الليلي / النهاري">
+          <i data-lucide="moon" id="themeIcon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Views Container -->
+  <main class="main-container">
+    
+    <!-- ============================================== -->
+    <!-- 1. VIEW: LEDGER & CUSTOMERS LIST (الرئيسية) -->
+    <!-- ============================================== -->
+    <section id="viewLedger" class="app-view active">
+      
+      <!-- Compact Ultra-Sleek Metrics Dashboard Card -->
+      <div class="metrics-banner-compact">
+        <div class="metric-compact-main">
+          <span class="metric-compact-label">
+            <i data-lucide="coins"></i> إجمالي فلوس السوق
+          </span>
+          <div class="metric-compact-value text-danger" id="totalMarketDebt">
+            0 <span class="currency-label">ج.م</span>
+          </div>
+        </div>
+
+        <div class="metric-compact-stats">
+          <div class="metric-mini-pill">
+            <span class="pill-dot success"></span>
+            <span class="pill-title">تحصيل اليوم:</span>
+            <strong class="pill-val text-success" id="todayCollections">0 ج.م</strong>
+          </div>
+          <div class="metric-mini-pill">
+            <span class="pill-dot warning"></span>
+            <span class="pill-title">المدينون:</span>
+            <strong class="pill-val text-warning" id="debtorsCount">0 عميل</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search & Add Customer Bar -->
+      <div class="search-filter-section">
+        <div class="search-action-row">
+          <div class="search-input-wrapper">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="customerSearchInput" placeholder="ابحث باسم العميل أو رقم الهاتف..." autocomplete="off">
+            <button class="clear-search-btn" id="clearSearchBtn" style="display: none;">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+          <button class="btn btn-primary add-cust-top-btn" id="btnGoAddCustomerTop" title="إضافة عميل جديد">
+            <i data-lucide="user-plus"></i>
+            <span>إضافة عميل</span>
+          </button>
+        </div>
+
+        <div class="filter-chips">
+          <button class="chip-btn active" data-filter="all">الكل (<span id="countAll">0</span>)</button>
+          <button class="chip-btn" data-filter="has_debt">عليهم فلوس (<span id="countDebt">0</span>)</button>
+          <button class="chip-btn" data-filter="settled">خالصين (<span id="countSettled">0</span>)</button>
+          <button class="chip-btn" data-filter="top_debt">الأعلى ديناً ⬇️</button>
+        </div>
+      </div>
+
+      <!-- Customers List Container -->
+      <div class="customers-list" id="customersListContainer">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 2. FULL SCREEN VIEW: CUSTOMER STATEMENT (كشف حساب) -->
+    <!-- ============================================== -->
+    <section id="viewCustomerDetail" class="app-view">
+      
+      <!-- Compact Proportionate Customer Header Strip -->
+      <div class="customer-compact-strip">
+        <div class="cust-info-col">
+          <div class="cust-avatar-mini" id="detailCustomerAvatar">أ</div>
+          <div class="cust-text-block">
+            <h3 class="cust-title-name" id="detailCustomerName">أحمد محمود عبد الرحمن</h3>
+            <div class="cust-meta-row">
+              <span class="cust-phone-badge" id="detailCustomerPhone"><i data-lucide="phone"></i> 01012345678</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cust-balance-col" id="detailBalanceBox">
+          <span class="balance-tag-label" id="detailBalanceBadge">الرصيد المطلوب:</span>
+          <div class="balance-tag-value text-danger" id="detailBalanceAmount">
+            0 <span class="currency-unit">ج.م</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 Primary Action Buttons in 1 Clean Row -->
+      <div class="customer-action-toolbar">
+        <button class="tool-btn btn-primary" id="btnCustomerGoPOS">
+          <i data-lucide="scan-barcode"></i>
+          <span>مسح مشتريات 🛒</span>
+        </button>
+        <button class="tool-btn btn-debt" id="btnCustomerAddDebt">
+          <i data-lucide="plus"></i>
+          <span>دين يدوي (+)</span>
+        </button>
+        <button class="tool-btn btn-payment" id="btnCustomerAddPayment">
+          <i data-lucide="minus"></i>
+          <span>سداد (-)</span>
+        </button>
+        <button class="tool-btn btn-whatsapp" id="btnCustomerWhatsApp" title="إرسال عبر واتساب">
+          <i data-lucide="message-circle"></i>
+          <span>واتساب</span>
+        </button>
+        <button class="tool-btn btn-pdf" id="btnCustomerPrintPDF" title="طباعة كشف حساب">
+          <i data-lucide="printer"></i>
+          <span>PDF</span>
+        </button>
+      </div>
+
+      <!-- Transactions History Timeline -->
+      <div class="section-divider" style="margin-top: 10px;">
+        <h3><i data-lucide="history"></i> سجل العمليات والحركات</h3>
+        <span class="badge" id="detailTxCount">0 حركة</span>
+      </div>
+
+      <div class="transactions-timeline" id="detailTransactionsList">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 3. FULL SCREEN VIEW: ADD TRANSACTION (تسجيل دين/سداد) -->
+    <!-- ============================================== -->
+    <section id="viewAddTransaction" class="app-view">
+      <div class="fullscreen-form-card">
+        
+        <div class="tx-mode-selector">
+          <button type="button" class="mode-tab active danger" id="tabModeDebt">
+            <i data-lucide="plus-circle"></i> سحب بضاعة (دين)
+          </button>
+          <button type="button" class="mode-tab success" id="tabModePayment">
+            <i data-lucide="minus-circle"></i> سداد فلوس (دفعة)
+          </button>
+        </div>
+
+        <form id="fullTransactionForm">
+          <input type="hidden" id="fullTxType" value="DEBT">
+
+          <div class="amount-hero-wrapper">
+            <label class="amount-hero-label">المبلغ المطلوب تسجيله:</label>
+            <div class="amount-input-box">
+              <input type="number" step="0.5" id="fullTxAmount" class="huge-amount-input" placeholder="0" required autofocus inputmode="decimal">
+              <span class="huge-amount-curr">ج.م</span>
+            </div>
+          </div>
+
+          <!-- Quick Amounts Row -->
+          <div class="quick-numpad-row">
+            <button type="button" class="num-chip" data-val="10">+10</button>
+            <button type="button" class="num-chip" data-val="20">+20</button>
+            <button type="button" class="num-chip" data-val="50">+50</button>
+            <button type="button" class="num-chip" data-val="100">+100</button>
+            <button type="button" class="num-chip" data-val="200">+200</button>
+            <button type="button" class="num-chip" data-val="500">+500</button>
+          </div>
+
+          <div class="form-group" style="margin-top: 18px;">
+            <label>البيان / الأصناف:</label>
+            <input type="text" id="fullTxDesc" class="form-input" placeholder="مثال: سكر + جبنة، دفعة كاش، طلبات بيت...">
+            <div class="quick-desc-chips">
+              <button type="button" class="desc-chip">طلبات بيت</button>
+              <button type="button" class="desc-chip">سجاير</button>
+              <button type="button" class="desc-chip">ألبان وجبن</button>
+              <button type="button" class="desc-chip">سداد نقدي</button>
+              <button type="button" class="desc-chip">فودافون كاش</button>
+            </div>
+          </div>
+
+          <div class="form-group" id="fullTxMethodGroup" style="display: none;">
+            <label>طريقة السداد:</label>
+            <select id="fullTxMethod" class="form-select">
+              <option value="CASH">💵 كاش ونقدي</option>
+              <option value="WALLET">📱 محفظة إلكترونية (فودافون كاش / إنستاباي)</option>
+              <option value="BANK">💳 تحويل بنكي</option>
+            </select>
+          </div>
+
+          <div class="fullscreen-submit-bar">
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="btnSaveFullTx">
+              <i data-lucide="check"></i> تأكيد وحفظ الحركة فوراً
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 4. FULL SCREEN VIEW: ADD CUSTOMER (إضافة عميل) -->
+    <!-- ============================================== -->
+    <section id="viewAddCustomer" class="app-view">
+      <div class="fullscreen-form-card">
+        <form id="fullCustomerForm">
+          <div class="form-group">
+            <label class="required-label">اسم العميل بالكامل:</label>
+            <input type="text" id="fullCustName" class="form-input" placeholder="مثال: أحمد محمود" required>
+          </div>
+
+          <div class="form-group">
+            <label>رقم الهاتف (لمراسلة الواتساب):</label>
+            <input type="tel" id="fullCustPhone" class="form-input" placeholder="010XXXXXXXX" inputmode="tel">
+          </div>
+
+          <div class="form-group">
+            <label>رصيد أو دين قديم في البداية (اختياري):</label>
+            <input type="number" step="0.5" id="fullCustInitialDebt" class="form-input" placeholder="0.00" inputmode="decimal">
+          </div>
+
+          <div class="fullscreen-submit-bar">
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+              <i data-lucide="user-plus"></i> حفظ العميل
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 5. VIEW: ULTRA-FAST HD BARCODE POS (الباركود فائق السرعة) -->
+    <!-- ============================================== -->
+    <section id="viewQuickPOS" class="app-view">
+      <div class="view-header">
+        <h2><i data-lucide="zap"></i> مسح باركود فائق السرعة HD</h2>
+        <p class="subtitle">تعرف فوري عالي الوضوح على باركود المنتجات لإضافتها للحساب</p>
+      </div>
+
+      <!-- High Definition Fast Scanner Viewport -->
+      <div class="hd-scanner-wrapper">
+        <div class="scanner-viewport-container">
+          <!-- Video element for hardware-accelerated BarcodeDetector -->
+          <video id="hdScannerVideo" playsinline autoplay muted class="hd-video-preview" style="display:none;"></video>
+          <!-- Fallback div for Html5Qrcode -->
+          <div id="barcodeReader" class="fallback-reader-box"></div>
+          
+          <!-- Laser Viewfinder Overlay -->
+          <div class="scanner-aim-overlay" id="scannerAimBox">
+            <div class="laser-scanner-line"></div>
+            <div class="corner-bracket top-left"></div>
+            <div class="corner-bracket top-right"></div>
+            <div class="corner-bracket bottom-left"></div>
+            <div class="corner-bracket bottom-right"></div>
+          </div>
+        </div>
+
+        <div class="scanner-controls-bar">
+          <button class="btn btn-primary" id="startScannerBtn">
+            <i data-lucide="camera"></i> تشغيل الكاميرا
+          </button>
+          <button class="btn btn-secondary" id="stopScannerBtn" style="display: none;">
+            <i data-lucide="camera-off"></i> إيقاف الكاميرا
+          </button>
+          <button class="icon-btn" id="toggleTorchBtn" style="display: none;" title="تشغيل الكشاف">
+            <i data-lucide="flashlight"></i>
+          </button>
+          <span class="badge" id="scannerStatusBadge">الكاميرا جاهزة</span>
+        </div>
+      </div>
+
+      <!-- Quick Manual Barcode / Search Box -->
+      <div class="manual-barcode-box">
+        <div class="search-input-wrapper" style="margin-bottom:0;">
+          <i data-lucide="barcode" class="search-icon"></i>
+          <input type="text" id="manualBarcodeInput" placeholder="أو اكتب/امسح الباركود بالمسدس هنا..." autocomplete="off">
+          <button class="btn btn-primary btn-sm" id="btnLookupManualBarcode" style="position: absolute; left: 6px; top: 6px; height: 36px;">
+            إضافة
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Cart & Customer Selection -->
+      <div class="pos-cart-card">
+        <div class="form-group">
+          <label><i data-lucide="user"></i> اختر العميل لتسجيل العملية على حسابه:</label>
+          <select id="posCustomerSelect" class="form-select">
+            <option value="">-- اضغط لاختيار العميل أو اتركه لبيع كاش --</option>
+          </select>
+        </div>
+
+        <div class="quick-tags-section">
+          <span class="tags-title">أصناف سريعة بنقرة واحدة:</span>
+          <div class="tags-row" id="quickTagsContainer">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Scanned Items List in Cart -->
+        <div class="cart-items-table">
+          <div class="cart-table-header">
+            <span>الصنف</span>
+            <span>الكمية</span>
+            <span>السعر</span>
+            <span>الإجمالي</span>
+            <span></span>
+          </div>
+          <div class="cart-items-body" id="posCartBody">
+            <div class="empty-cart-msg">
+              <i data-lucide="shopping-cart"></i>
+              <p>امسح باركود صنف بالكاميرا أو اختر صنفاً سريعاً لإضافته</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Summary & Actions -->
+        <div class="cart-total-bar">
+          <div class="cart-total-info">
+            <span>إجمالي الفاتورة:</span>
+            <strong class="total-price" id="posCartTotal">0 ج.م</strong>
+          </div>
+          <div class="cart-action-buttons">
+            <button class="btn btn-danger btn-lg" id="posSaveAsDebtBtn" disabled>
+              <i data-lucide="user-minus"></i> تسجيل على الحساب (آجل)
+            </button>
+            <button class="btn btn-success btn-lg" id="posSaveAsCashBtn" disabled>
+              <i data-lucide="banknote"></i> قبض كاش فوري
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 6. VIEW: PRODUCTS CATALOG (المنتجات والأسعار) -->
+    <!-- ============================================== -->
+    <section id="viewProducts" class="app-view">
+      <div class="view-header flex-between">
+        <div>
+          <h2><i data-lucide="package"></i> المنتجات وقائمة الأسعار</h2>
+          <p class="subtitle">أصناف البقالة، الباركود، والأسعار المعتمدة</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="btnGoAddProduct">
+          <i data-lucide="plus-circle"></i> صنف جديد
+        </button>
+      </div>
+
+      <!-- Search and Quick Tools -->
+      <div class="products-toolbar">
+        <div class="search-input-wrapper">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" id="productSearchInput" placeholder="ابحث باسم المنتج أو رقم الباركود...">
+        </div>
+        <div class="tools-btn-group">
+          <button class="btn btn-outline btn-sm" id="exportProductsExcelBtn" title="تصدير شيت إكسيل">
+            <i data-lucide="file-spreadsheet"></i> تصدير إكسيل
+          </button>
+          <label class="btn btn-outline btn-sm file-upload-label" title="استيراد من إكسيل">
+            <i data-lucide="upload"></i> استيراد إكسيل
+            <input type="file" id="importProductsExcelInput" accept=".xlsx, .xls, .csv" style="display:none;">
+          </label>
+        </div>
+      </div>
+
+      <!-- Products Grid/List -->
+      <div class="products-grid" id="productsGridContainer">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 7. FULL SCREEN VIEW: ADD PRODUCT (صنف جديد) -->
+    <!-- ============================================== -->
+    <section id="viewAddProduct" class="app-view">
+      <div class="fullscreen-form-card">
+        <form id="fullProductForm">
+          <div class="form-group">
+            <label>رقم الباركود (يمكنك كتابته أو مسحه):</label>
+            <div class="barcode-input-row">
+              <input type="text" id="fullProdBarcode" class="form-input" placeholder="امسح أو اكتب الباركود">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="required-label">اسم المنتج:</label>
+            <input type="text" id="fullProdName" class="form-input" placeholder="مثال: شاي العروسة 40جم" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="required-label">سعر البيع (ج.م):</label>
+              <input type="number" step="0.5" id="fullProdPrice" class="form-input" placeholder="0.00" required inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <label>التصنيف / القسم:</label>
+              <input type="text" id="fullProdCategory" class="form-input" placeholder="بقالة / ألبان / سجاير">
+            </div>
+          </div>
+
+          <div class="fullscreen-submit-bar">
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+              <i data-lucide="save"></i> حفظ الصنف
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 8. VIEW: SETTINGS & SYNC (الإعدادات والمزامنة) -->
+    <!-- ============================================== -->
+    <section id="viewSettings" class="app-view">
+      <div class="view-header">
+        <h2><i data-lucide="settings"></i> الإعدادات والنسخ الاحتياطي</h2>
+        <p class="subtitle">المزامنة مع Google Sheets، النسخ الاحتياطي، وبيانات المحل</p>
+      </div>
+
+      <div class="settings-grid">
+        
+        <!-- Font Size & Interface Display Scaling Card -->
+        <div class="card settings-card">
+          <div class="card-header">
+            <h3><i data-lucide="type"></i> حجم الخط والقراءة</h3>
+          </div>
+          <div class="card-body">
+            <p class="card-description">تحكم في حجم خط التطبيق لسهولة القراءة والرؤية السريعة للكاشير:</p>
+            <div class="font-size-selector">
+              <button type="button" class="font-size-btn" data-scale="sm" id="fontScaleSm">
+                <span>صغير</span>
+                <strong>A-</strong>
+              </button>
+              <button type="button" class="font-size-btn active" data-scale="md" id="fontScaleMd">
+                <span>متوسط</span>
+                <strong>A</strong>
+              </button>
+              <button type="button" class="font-size-btn" data-scale="lg" id="fontScaleLg">
+                <span>كبير</span>
+                <strong>A+</strong>
+              </button>
+              <button type="button" class="font-size-btn" data-scale="xl" id="fontScaleXl">
+                <span>ضخم</span>
+                <strong>A++</strong>
+              </button>
+            </div>
+            <div class="font-preview-box">
+              <span>معاينة الخط:</span>
+              <strong>أحمد محمود عبد الرحمن - رصيد: 650 ج.م</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Store Information Card -->
+        <div class="card settings-card">
+          <div class="card-header">
+            <h3><i data-lucide="store"></i> بيانات المحل</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>اسم المحل / البقالة:</label>
+              <input type="text" id="settingStoreName" class="form-input" placeholder="مثال: بقالة الأمانة">
+            </div>
+            <div class="form-group">
+              <label>رقم هاتف المحل / الكاشير:</label>
+              <input type="tel" id="settingStorePhone" class="form-input" placeholder="01012345678">
+            </div>
+            <div class="form-group">
+              <label>العملة الافتراضية:</label>
+              <input type="text" id="settingCurrency" class="form-input" value="ج.م">
+            </div>
+            <button class="btn btn-primary btn-block" id="saveStoreSettingsBtn">
+              <i data-lucide="save"></i> حفظ بيانات المحل
+            </button>
+          </div>
+        </div>
+
+        <!-- Google Sheets Cloud Sync Card -->
+        <div class="card settings-card">
+          <div class="card-header">
+            <h3><i data-lucide="cloud"></i> المزامنة مع Google Sheets</h3>
+          </div>
+          <div class="card-body">
+            <p class="card-description">
+              يمكنك ربط التطبيق بشيت جوجل مجاناً عبر <strong>Google Apps Script</strong> لحفظ نسخة احتياطية حية لحظية.
+            </p>
+            <div class="form-group">
+              <label>رابط Google Apps Script Web App URL:</label>
+              <input type="url" id="settingGoogleScriptUrl" class="form-input" placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+            <div class="sync-actions-row">
+              <button class="btn btn-success" id="manualSyncNowBtn">
+                <i data-lucide="refresh-cw"></i> مزامنة الآن مع Google Sheets
+              </button>
+              <button class="btn btn-outline" id="btnGoScriptCode">
+                <i data-lucide="code"></i> كود الاسكريبت الجاهز
+              </button>
+            </div>
+            <div id="syncStatusMessage" class="sync-status-box">آخر مزامنة: لم تتم بعد</div>
+          </div>
+        </div>
+
+        <!-- Full Database Backup & Excel Card -->
+        <div class="card settings-card">
+          <div class="card-header">
+            <h3><i data-lucide="hard-drive-download"></i> النسخ الاحتياطي الشامل</h3>
+          </div>
+          <div class="card-body">
+            <p class="card-description">احفظ نسخة كاملة من كل العملاء والحسابات والعمليات على هاتفك أو كمبيوترك.</p>
+            <div class="backup-buttons-row">
+              <button class="btn btn-primary" id="exportFullExcelBackupBtn">
+                <i data-lucide="file-spreadsheet"></i> تصدير كل الحسابات (Excel)
+              </button>
+              <button class="btn btn-secondary" id="exportJsonBackupBtn">
+                <i data-lucide="database"></i> تصدير نسخة كاملة (JSON)
+              </button>
+              <label class="btn btn-outline file-upload-label">
+                <i data-lucide="upload"></i> استرجاع نسخة سابقة (JSON)
+                <input type="file" id="importJsonBackupInput" accept=".json" style="display:none;">
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- 9. FULL SCREEN VIEW: GOOGLE APPS SCRIPT GUIDE -->
+    <!-- ============================================== -->
+    <section id="viewScriptCode" class="app-view">
+      <div class="fullscreen-form-card">
+        <h3 style="margin-bottom: 12px;"><i data-lucide="code"></i> كود Google Apps Script الجاهز</h3>
+        <p class="card-description">
+          طريقة التفعيل في 3 خطوات بسيطة:<br>
+          1. افتح شيت جوجل جديد واضغط على <strong>Extensions (الإضافات) ⬅️ Apps Script</strong>.<br>
+          2. الصق الكود البرمجي أدناه بالكامل ثم اضغط <strong>Deploy (نشر) ⬅️ New deployment ⬅️ Web app</strong>.<br>
+          3. اضبط خيار <strong>Who has access</strong> على <strong>Anyone</strong> ثم انسخ الرابط وضعه في إعدادات التطبيق.
+        </p>
+        <div class="code-box-container">
+          <pre><code id="googleAppsScriptCodeSnippet"></code></pre>
+          <button class="btn btn-primary btn-sm copy-code-btn" id="copyAppsScriptBtn">
+            <i data-lucide="copy"></i> نسخ الكود
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================== -->
+  <!-- BOTTOM NAVIGATION BAR (شريط التنقل السفلي) -->
+  <!-- ============================================== -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-item active" data-view="viewLedger">
+      <i data-lucide="users"></i>
+      <span>الحسابات</span>
+    </button>
+    <button class="nav-item" data-view="viewQuickPOS">
+      <i data-lucide="zap"></i>
+      <span>تسجيل سريع</span>
+    </button>
+    <button class="nav-item" data-view="viewProducts">
+      <i data-lucide="package"></i>
+      <span>المنتجات</span>
+    </button>
+    <button class="nav-item" data-view="viewSettings">
+      <i data-lucide="settings"></i>
+      <span>الإعدادات</span>
+    </button>
+  </nav>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Core App Logic Script -->
+  <script src="app.js"></script>
+</body>
+</html>
