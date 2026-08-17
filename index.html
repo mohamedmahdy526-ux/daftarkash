@@ -76,27 +76,35 @@
     <!-- ============================================== -->
     <section id="viewLedger" class="app-view active">
       
-      <!-- Compact Ultra-Sleek Metrics Dashboard Card -->
+      <!-- 3-Column Symmetric Fintech Metrics Banner -->
       <div class="metrics-banner-compact">
-        <div class="metric-compact-main">
-          <span class="metric-compact-label">
-            <i data-lucide="coins"></i> إجمالي فلوس السوق
-          </span>
-          <div class="metric-compact-value text-danger" id="totalMarketDebt">
-            0 <span class="currency-label">ج.م</span>
+        <div class="metric-card-compact danger-accent">
+          <div class="metric-header-mini">
+            <i data-lucide="coins"></i>
+            <span>فلوس السوق</span>
+          </div>
+          <div class="metric-value-mini text-danger" id="totalMarketDebt">
+            0 <span class="currency-unit-mini">ج.م</span>
           </div>
         </div>
 
-        <div class="metric-compact-stats">
-          <div class="metric-mini-pill">
-            <span class="pill-dot success"></span>
-            <span class="pill-title">تحصيل اليوم:</span>
-            <strong class="pill-val text-success" id="todayCollections">0 ج.م</strong>
+        <div class="metric-card-compact success-accent">
+          <div class="metric-header-mini">
+            <i data-lucide="banknote"></i>
+            <span>تحصيل اليوم</span>
           </div>
-          <div class="metric-mini-pill">
-            <span class="pill-dot warning"></span>
-            <span class="pill-title">المدينون:</span>
-            <strong class="pill-val text-warning" id="debtorsCount">0 عميل</strong>
+          <div class="metric-value-mini text-success" id="todayCollections">
+            0 <span class="currency-unit-mini">ج.م</span>
+          </div>
+        </div>
+
+        <div class="metric-card-compact primary-accent">
+          <div class="metric-header-mini">
+            <i data-lucide="users"></i>
+            <span>المدينون</span>
+          </div>
+          <div class="metric-value-mini" style="color: var(--primary);" id="debtorsCount">
+            0 <span class="currency-unit-mini">عميل</span>
           </div>
         </div>
       </div>

@@ -340,9 +340,9 @@ async function refreshLedgerView() {
     }
   }
 
-  document.getElementById('totalMarketDebt').innerHTML = `${formatMoney(totalMarketDebt)} <span class="currency-label">ج.م</span>`;
-  document.getElementById('todayCollections').textContent = `${formatMoney(todayCollections)} ج.م`;
-  document.getElementById('debtorsCount').textContent = `${debtorsCount} عميل`;
+  document.getElementById('totalMarketDebt').innerHTML = `${formatMoney(totalMarketDebt)} <span class="currency-unit-mini">ج.م</span>`;
+  document.getElementById('todayCollections').innerHTML = `${formatMoney(todayCollections)} <span class="currency-unit-mini">ج.م</span>`;
+  document.getElementById('debtorsCount').innerHTML = `${debtorsCount} <span class="currency-unit-mini">عميل</span>`;
 
   document.getElementById('countAll').textContent = customers.length;
   document.getElementById('countDebt').textContent = debtorsCount;
