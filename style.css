@@ -61,10 +61,12 @@
   --shadow-glow-danger: 0 4px 16px rgba(239, 68, 68, 0.3);
   --shadow-glow-success: 0 4px 16px rgba(16, 185, 129, 0.3);
   
-  /* Dimensions & Spacing */
-  --header-height: 62px;
-  --bottom-nav-height: 68px;
-  --container-max-width: 600px;
+  /* Mobile Dimensions & Safe-Area Ergonomics */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --header-height: calc(56px + var(--safe-top));
+  --bottom-nav-height: calc(60px + var(--safe-bottom));
+  --container-max-width: 480px;
 }
 
 /* Light Theme Overrides */
@@ -95,18 +97,20 @@ body.theme-light {
 }
 
 /* ===================================================
-   Base Reset & Global Layout
+   Base Reset & Mobile Ergonomics
    =================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 html {
   font-size: 14.5px;
   -webkit-text-size-adjust: 100%;
+  height: 100%;
 }
 
 /* Font Scale Presets */
@@ -120,9 +124,10 @@ body {
   background-color: var(--bg-main);
   color: var(--text-main);
   direction: rtl;
-  min-height: 100vh;
+  min-height: 100%;
+  min-height: -webkit-fill-available;
   padding-top: var(--header-height);
-  padding-bottom: calc(var(--bottom-nav-height) + 24px);
+  padding-bottom: calc(var(--bottom-nav-height) + 18px);
   overflow-x: hidden;
   user-select: none;
   -webkit-font-smoothing: antialiased;
@@ -130,13 +135,13 @@ body {
 }
 
 /* Tabular numbers for fintech precision */
-.metric-value, .balance-tag, .tx-amount, .total-price, .currency-unit {
+.metric-value, .balance-tag, .tx-amount, .total-price, .currency-unit, .metric-value-mini {
   font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
 }
 
 /* ===================================================
-   Header Navigation Bar
+   Header Navigation Bar (With Mobile Safe-Area)
    =================================================== */
 .app-header {
   position: fixed;
@@ -144,7 +149,8 @@ body {
   right: 0;
   left: 0;
   height: var(--header-height);
-  background-color: rgba(18, 24, 38, 0.88);
+  padding-top: var(--safe-top);
+  background-color: rgba(18, 24, 38, 0.92);
   border-bottom: 1px solid var(--border-color);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -152,14 +158,14 @@ body {
 }
 
 body.theme-light .app-header {
-  background-color: rgba(255, 255, 255, 0.88);
+  background-color: rgba(255, 255, 255, 0.92);
 }
 
 .header-content {
   max-width: var(--container-max-width);
   margin: 0 auto;
-  height: 100%;
-  padding: 0 16px;
+  height: 56px;
+  padding: 0 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -315,7 +321,8 @@ body.theme-light .app-header {
   right: 0;
   left: 0;
   height: var(--bottom-nav-height);
-  background-color: rgba(18, 24, 38, 0.92);
+  padding-bottom: var(--safe-bottom);
+  background-color: rgba(18, 24, 38, 0.94);
   border-top: 1px solid var(--border-color);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -325,7 +332,8 @@ body.theme-light .app-header {
   z-index: 100;
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: 0 8px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 body.theme-light .bottom-nav {
