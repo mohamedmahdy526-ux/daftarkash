@@ -415,7 +415,8 @@ async function openCustomerDetails(customerId, pushToStack = true) {
   const txs = await db.transactions.where('customerId').equals(selectedCustomerId).reverse().sortBy('timestamp');
 
   document.getElementById('detailCustomerName').textContent = customer.name;
-  document.getElementById('detailCustomerAvatar').textContent = customer.name.charAt(0);
+  const avatarElem = document.getElementById('detailCustomerAvatar');
+  if (avatarElem) avatarElem.textContent = customer.name.charAt(0);
   document.getElementById('detailCustomerPhone').innerHTML = customer.phone ? `<i data-lucide="phone"></i> ${customer.phone}` : 'بدون هاتف مسجل';
 
   const balanceAmount = document.getElementById('detailBalanceAmount');
