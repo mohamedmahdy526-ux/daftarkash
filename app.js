@@ -43,10 +43,12 @@ function navigateTo(viewId, title = '', pushToStack = true) {
   const subTitle = document.getElementById('headerSubTitle');
   const bottomNav = document.getElementById('bottomNav');
 
+  // Bottom Nav is permanently fixed and visible
+  bottomNav.style.display = 'flex';
+
   if (isRootView) {
     brandSection.style.display = 'flex';
     subSection.style.display = 'none';
-    bottomNav.style.display = 'flex';
     
     document.querySelectorAll('.bottom-nav .nav-item').forEach(b => {
       b.classList.toggle('active', b.dataset.view === viewId);
@@ -59,7 +61,13 @@ function navigateTo(viewId, title = '', pushToStack = true) {
     brandSection.style.display = 'none';
     subSection.style.display = 'flex';
     subTitle.textContent = title || 'رجوع';
-    bottomNav.style.display = 'none';
+
+    // Keep the ledger tab active if in customer statement or transaction screens
+    document.querySelectorAll('.bottom-nav .nav-item').forEach(b => {
+      if (['viewCustomerDetail', 'viewAddCustomer', 'viewAddTransaction'].includes(viewId)) {
+        b.classList.toggle('active', b.dataset.view === 'viewLedger');
+      }
+    });
 
     if (pushToStack) {
       viewStack.push(viewId);
