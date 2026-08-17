@@ -488,7 +488,7 @@ function openAddTxScreen(type = 'DEBT', customerName = '') {
   document.getElementById('fullTxDesc').value = '';
   setFullTxType(type);
   
-  const title = type === 'DEBT' ? `سحب بضاعة: ${customerName}` : `سداد دفعة: ${customerName}`;
+  const title = type === 'DEBT' ? `تسجيل دين: ${customerName}` : `سداد دفعة: ${customerName}`;
   navigateTo('viewAddTransaction', title, true);
   setTimeout(() => document.getElementById('fullTxAmount').focus(), 150);
 }
