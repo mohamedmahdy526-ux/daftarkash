@@ -97,12 +97,13 @@ body.theme-light {
 }
 
 /* ===================================================
-   Base Reset & Mobile Ergonomics
+   Base Reset, Universal Cairo Font & Mobile Ergonomics
    =================================================== */
-*, *::before, *::after {
+*, *::before, *::after,
+body, button, input, select, textarea, optgroup, option,
+h1, h2, h3, h4, h5, h6, p, span, a, label, table, tr, td, th {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -120,7 +121,8 @@ html.font-scale-lg { font-size: 16px !important; }
 html.font-scale-xl { font-size: 17.5px !important; }
 
 body {
-  font-family: var(--font-family);
+  margin: 0;
+  padding: 0;
   background-color: var(--bg-main);
   color: var(--text-main);
   direction: rtl;
@@ -135,7 +137,7 @@ body {
 }
 
 /* Tabular numbers for fintech precision */
-.metric-value, .balance-tag, .tx-amount, .total-price, .currency-unit, .metric-value-mini {
+.metric-value, .balance-tag, .tx-amount, .total-price, .currency-unit, .metric-value-mini, .huge-amount-input {
   font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
 }
