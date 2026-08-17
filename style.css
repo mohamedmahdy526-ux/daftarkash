@@ -534,27 +534,30 @@ body.theme-light .bottom-nav {
   justify-content: center;
 }
 
-.btn-primary-add {
+.add-cust-icon-btn {
+  width: 44px;
   height: 44px;
-  padding: 0 16px;
+  min-width: 44px;
   background: var(--primary-gradient);
   border: none;
   border-radius: var(--radius-sm);
   color: #FFFFFF;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 800;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   cursor: pointer;
   box-shadow: var(--shadow-glow-primary);
-  white-space: nowrap;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-.btn-primary-add:active {
-  transform: scale(0.95);
+.add-cust-icon-btn i {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.5px;
+}
+
+.add-cust-icon-btn:active {
+  transform: scale(0.92);
   opacity: 0.9;
 }
 
@@ -598,7 +601,7 @@ body.theme-light .bottom-nav {
 }
 
 /* ===================================================
-   Customer Cards List
+   Customer Cards List (Clean, Bold Name & Symmetry)
    =================================================== */
 .customers-list {
   display: flex;
@@ -610,7 +613,7 @@ body.theme-light .bottom-nav {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 12px 14px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -624,59 +627,40 @@ body.theme-light .bottom-nav {
   background-color: var(--bg-card-elevated);
 }
 
-.card-left-info {
+.customer-info {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.customer-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-  color: #FFF;
-  font-size: 1.1rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
-}
-
-.customer-text-info {
+  flex-direction: column;
+  gap: 3px;
   min-width: 0;
 }
 
 .customer-name {
-  font-size: 0.98rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 2px;
+  line-height: 1.25;
 }
 
-.customer-meta {
+.customer-last-tx {
+  font-size: 0.74rem;
+  color: var(--text-dim);
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.75rem;
-  color: var(--text-dim);
+  gap: 4px;
 }
 
-.customer-meta span {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.customer-meta i {
+.customer-last-tx i {
   width: 12px;
   height: 12px;
+}
+
+.customer-balance-box {
+  text-align: left;
+  flex-shrink: 0;
+  padding-right: 12px;
 }
 
 .card-right-balance {

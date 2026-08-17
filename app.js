@@ -385,20 +385,13 @@ async function refreshLedgerView() {
 
   container.innerHTML = filtered.map(c => {
     const isDebt = c.balance > 0;
-    const initialLetter = c.name ? c.name.trim().charAt(0) : '؟';
-    const lastDateStr = c.lastTx ? formatDateRelative(c.lastTx.timestamp) : 'لا توجد حركات';
+    const lastDateStr = c.lastTx ? formatDateRelative(c.lastTx.timestamp) : '';
 
     return `
       <div class="customer-card" onclick="openCustomerDetails(${c.id})">
         <div class="customer-info">
-          <div class="avatar-circle">${initialLetter}</div>
-          <div class="customer-meta">
-            <h4>${c.name}</h4>
-            <div class="customer-subtext">
-              <span><i data-lucide="clock" style="width:12px; height:12px;"></i> ${lastDateStr}</span>
-              ${c.phone ? `<span>| <i data-lucide="phone" style="width:12px; height:12px;"></i> ${c.phone}</span>` : ''}
-            </div>
-          </div>
+          <h4 class="customer-name">${c.name}</h4>
+          ${lastDateStr ? `<div class="customer-last-tx"><i data-lucide="clock"></i> ${lastDateStr}</div>` : ''}
         </div>
         <div class="customer-balance-box">
           <div class="balance-tag ${isDebt ? 'debt' : 'settled'}">
