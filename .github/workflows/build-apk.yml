@@ -42,6 +42,54 @@ jobs:
           npx cap add android || true
           npx cap sync android
 
+      - name: Inject Android Permissions & Camera Handler
+        run: |
+          # Inject full Android permissions into AndroidManifest.xml
+          sed -i '/<manifest/a \    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />' android/app/src/main/AndroidManifest.xml
+          
+          # Create Custom MainActivity with WebView Camera Permission Granting
+          cat << 'EOF' > android/app/src/main/java/com/daftarkash/app/MainActivity.java
+          package com.daftarkash.app;
+
+          import android.Manifest;
+          import android.content.pm.PackageManager;
+          import android.os.Bundle;
+          import android.webkit.PermissionRequest;
+          import android.webkit.WebChromeClient;
+          import androidx.core.app.ActivityCompat;
+          import androidx.core.content.ContextCompat;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+              private static final int CAMERA_PERMISSION_CODE = 101;
+
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  
+                  // Request Android Runtime Camera Permission on startup if not granted
+                  if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                      ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+                  }
+
+                  // Handle WebView WebChromeClient permission requests for getUserMedia
+                  if (this.bridge != null && this.bridge.getWebView() != null) {
+                      this.bridge.getWebView().setWebChromeClient(new WebChromeClient() {
+                          @Override
+                          public void onPermissionRequest(final PermissionRequest request) {
+                              MainActivity.this.runOnUiThread(new Runnable() {
+                                  @Override
+                                  public void run() {
+                                      request.grant(request.getResources());
+                                  }
+                              });
+                          }
+                      });
+                  }
+              }
+          }
+          EOF
+
       - name: Grant Execute Permission for Gradlew
         run: chmod +x android/gradlew
 
@@ -62,12 +110,12 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           files: android/app/build/outputs/apk/debug/app-debug.apk
-          tag_name: v1.0.0
-          name: "دفتر كاش - نسخة أندرويد الرسمية APK v1.0.0"
+          tag_name: v1.0.1
+          name: "دفتر كاش - نسخة أندرويد مع دعم الأذونات الكاملة v1.0.1"
           body: |
-            ### 📱 تطبيق دفتر كاش للأندرويد (DaftarKash APK)
-            * تطبيق أصلي سريع يعمل بدون إنترنت مع مزامنة سحابية فورية.
-            * دعم مسح الباركود بالكاميرا وإدارة الديون وحسابات المحلات.
+            ### 📱 تطبيق دفتر كاش للأندرويد (تحديث دعم الأذونات v1.0.1)
+            * تفعيل طلب إذن الكاميرا تلقائياً لمسح باركود المنتجات بسرعة فائقة.
+            * دعم كامل للصوت والاهتزاز والمزامنة السحابية الدائمة.
             * حمل الملف أدناه `app-debug.apk` وثبته على هاتفك مباشرة!
           draft: false
           prerelease: false

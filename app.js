@@ -851,6 +851,7 @@ async function startBarcodeScanner() {
     console.error('Camera fallback error:', err);
     statusBadge.textContent = 'تعذر تشغيل الكاميرا (يرجى السماح بالإذن)';
     statusBadge.className = 'badge text-danger';
+    showToast('يرجى السماح بالوصول إلى الكاميرا من إعدادات الهاتف لمسح الباركود 📷', 'warning');
   }
 }
 
