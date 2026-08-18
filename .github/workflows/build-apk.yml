@@ -32,6 +32,11 @@ jobs:
         run: |
           npm install
 
+      - name: Prepare Web Assets in www
+        run: |
+          mkdir -p www
+          cp -r index.html style.css app.js manifest.json icon.jpg icon-192.png icon-512.png www/
+
       - name: Initialize Capacitor Android Project
         run: |
           npx cap add android || true

@@ -1,8 +1,7 @@
 {
   "appId": "com.daftarkash.app",
   "appName": "دفتر كاش",
-  "webDir": ".",
-  "bundledWebRuntime": false,
+  "webDir": "www",
   "server": {
     "androidScheme": "https",
     "cleartext": true
