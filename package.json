@@ -1,0 +1,34 @@
+{
+  "name": "daftarkash",
+  "version": "1.0.0",
+  "description": "دفتر كاش - تطبيق إدارة الديون وحسابات المحلات التجارية",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo \"Ready\"",
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android"
+  },
+  "keywords": [
+    "pos",
+    "grocery",
+    "ledger",
+    "pwa",
+    "android"
+  ],
+  "author": "Mohamed Mahdy",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/cli": "^6.2.0",
+    "@capacitor/core": "^6.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohamedmahdy526-ux/daftarkash.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mohamedmahdy526-ux/daftarkash/issues"
+  },
+  "homepage": "https://github.com/mohamedmahdy526-ux/daftarkash#readme"
+}
