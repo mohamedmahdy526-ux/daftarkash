@@ -27,10 +27,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install NPM Dependencies
-        run: npm install
+      - name: Install NPM & Capacitor
+        run: |
+          npm install
 
       - name: Initialize Capacitor Android Project
         run: |
@@ -54,10 +54,10 @@ jobs:
 
       - name: Create GitHub Release with APK
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           files: android/app/build/outputs/apk/debug/app-debug.apk
-          tag_name: v1.0.0-apk
+          tag_name: v1.0.0
           name: "دفتر كاش - نسخة أندرويد الرسمية APK v1.0.0"
           body: |
             ### 📱 تطبيق دفتر كاش للأندرويد (DaftarKash APK)
