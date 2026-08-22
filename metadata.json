@@ -1,0 +1,8 @@
+{
+  "name": "دفتر كاش",
+  "description": "دفتر كاش - تطبيق ذكي متكامل لإدارة حسابات المحلات، ديون وسداد العملاء، وسجل الفواتير مع تصدير كشوف حسابات PDF وإكسيل ومزامنة سحابية مع Google Sheets",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
